@@ -1,7 +1,14 @@
 # PawPal+ Project Reflection
 
 ## 1. System Design
+1. Add and manage pets
+The user should be able to enter basic information about their pet (such as name, type, age, or special needs) and update it when needed.
 
+2. Create and manage care tasks
+The user should be able to add tasks like feeding, walking, or medication, including details like duration, priority, and frequency.
+
+3. Generate and view a daily schedule
+The system should create an optimized daily plan based on the user’s available time, task priorities, and constraints, and display it clearly along with an explanation.
 **a. Initial design**
 
 - Briefly describe your initial UML design.
