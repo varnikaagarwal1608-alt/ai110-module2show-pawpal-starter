@@ -7,25 +7,21 @@ from itertools import combinations
 # -------------------- Task --------------------
 @dataclass
 class Task:
-    name: str
-    duration: int
-    priority: str
-    frequency: str
-    pet: Optional["Pet"] = None
-    completed: bool = False
-    time: str = "09:00"  # format HH:MM
-    due_date: Optional[date] = None
+    def __init__(self, name, duration, priority, frequency, pet=None, completed=False, time=None, due_date=None):
+        self.name = name
+        self.duration = duration
+        self.priority = priority
+        self.frequency = frequency
+        self.pet = pet
+        self.completed = completed
+        self.time = time
+        # if no due_date is provided, default to today
+        self.due_date = due_date or date.today()
 
     def mark_complete(self):
-        """Mark this task as completed and create next recurring instance if applicable."""
         self.completed = True
-        if self.is_recurring() and self.due_date:
-            if self.frequency.lower() == "daily":
-                next_date = self.due_date + timedelta(days=1)
-            elif self.frequency.lower() == "weekly":
-                next_date = self.due_date + timedelta(days=7)
-            else:
-                return  # Unsupported frequency
+        if self.frequency.lower() in ["daily", "weekly"]:
+            next_date = self.due_date + timedelta(days=1 if self.frequency.lower() == "daily" else 7)
             new_task = Task(
                 name=self.name,
                 duration=self.duration,
@@ -38,7 +34,6 @@ class Task:
             )
             if self.pet:
                 self.pet.add_task(new_task)
-
     def update_task(self, name=None, duration=None, priority=None, frequency=None):
         """Update task details."""
         if name:
@@ -164,15 +159,10 @@ class Scheduler:
         return [t for t in self.tasks_list if t.completed == completed]
 
     def detect_conflicts(self):
-        """Detect scheduling conflicts based on overlapping times and return warning messages."""
+        """Detect scheduling conflicts based on overlapping times and return list of conflicting task pairs."""
         def time_to_minutes(t: str) -> int:
             h, m = map(int, t.split(':'))
             return h * 60 + m
-        
-        def minutes_to_time(minutes: int) -> str:
-            h = minutes // 60
-            m = minutes % 60
-            return f"{h:02d}:{m:02d}"
         
         tasks = self.daily_plan  # Check conflicts in the daily plan
         conflicts = []
@@ -182,10 +172,6 @@ class Scheduler:
             start2 = time_to_minutes(t2.time)
             end2 = start2 + t2.duration
             if start1 < end2 and start2 < end1:
-                end1_str = minutes_to_time(end1)
-                end2_str = minutes_to_time(end2)
-                conflicts.append(f"Warning: Conflict between '{t1.name}' ({t1.time}-{end1_str}) and '{t2.name}' ({t2.time}-{end2_str})")
+                conflicts.append((t1, t2))
         
-        if conflicts:
-            return "\n".join(conflicts)
-        return "No conflicts detected."
+        return conflicts

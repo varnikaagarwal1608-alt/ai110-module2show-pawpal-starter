@@ -49,3 +49,18 @@ The PawPal+ system now includes:
 - Filtering by pet and completion status
 - Basic conflict detection for overlapping tasks
 - Support for recurring tasks (daily/weekly)
+
+## Testing PawPal+
+
+To ensure PawPal+ works correctly, we created an automated test suite using `pytest`.
+
+**Run the tests:**  
+```bash
+python -m pytest
+What the tests cover:
+-Task completion and addition
+-Recurring task creation (daily and weekly)
+-Sorting tasks by priority and time
+-Conflict detection between overlapping tasks
+-Edge cases like empty lists, invalid times, and task updates
+Confidence Level: ⭐⭐⭐⭐⭐
