@@ -14,14 +14,17 @@ The system should create an optimized daily plan based on the user’s available
 - Briefly describe your initial UML design.
 - What classes did you include, and what responsibilities did you assign to each?
 
+-My initial UML design included four main classes: Owner, Pet, Task, and Scheduler. The Owner class is responsible for storing user information such as name, available time, and preferences, and for managing pets. The Pet class represents individual pets and stores details like name, type, age, and any special needs, along with their associated tasks. The Task class represents different pet care activities such as feeding or walking, and includes attributes like duration, priority, and frequency. The Scheduler class is responsible for organizing tasks into a daily plan based on constraints like available time and task priority. Overall, the design focuses on separating responsibilities clearly while allowing the classes to interact through defined relationships.
+---
 **b. Design changes**
 
 - Did your design change during implementation?
 - If yes, describe at least one change and why you made it.
 
+-While no changes were made to the Python skeleton itself, reviewing it with AI made me think about improvements in class relationships. For example, linking the Scheduler directly to the Owner (instead of just passing available_time) would make the system more consistent. I also reviewed how tasks should be associated with pets to ensure clear object relationships. These reflections helped refine my design thinking without altering the actual code.
 ---
-
 ## 2. Scheduling Logic and Tradeoffs
+My scheduler uses a simple conflict detection approach that only checks for exact time matches between tasks. This improves readability and keeps the implementation lightweight, but it does not handle overlapping durations, which could lead to missed conflicts in more complex scenarios.
 
 **a. Constraints and priorities**
 

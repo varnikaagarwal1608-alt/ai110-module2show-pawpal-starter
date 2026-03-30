@@ -1,5 +1,7 @@
 from dataclasses import dataclass, field
 from typing import List, Optional
+from datetime import date, timedelta
+from itertools import combinations
 
 
 # -------------------- Task --------------------
@@ -11,10 +13,31 @@ class Task:
     frequency: str
     pet: Optional["Pet"] = None
     completed: bool = False
+    time: str = "09:00"  # format HH:MM
+    due_date: Optional[date] = None
 
     def mark_complete(self):
-        """Mark this task as completed."""
+        """Mark this task as completed and create next recurring instance if applicable."""
         self.completed = True
+        if self.is_recurring() and self.due_date:
+            if self.frequency.lower() == "daily":
+                next_date = self.due_date + timedelta(days=1)
+            elif self.frequency.lower() == "weekly":
+                next_date = self.due_date + timedelta(days=7)
+            else:
+                return  # Unsupported frequency
+            new_task = Task(
+                name=self.name,
+                duration=self.duration,
+                priority=self.priority,
+                frequency=self.frequency,
+                pet=self.pet,
+                completed=False,
+                time=self.time,
+                due_date=next_date
+            )
+            if self.pet:
+                self.pet.add_task(new_task)
 
     def update_task(self, name=None, duration=None, priority=None, frequency=None):
         """Update task details."""
@@ -31,6 +54,10 @@ class Task:
     def get_details(self):
         """Return a summary of the task details."""
         return f"{self.name} ({self.priority}) - {self.duration} mins, Completed: {self.completed}"
+    
+    def is_recurring(self):
+        """Check if task is recurring."""
+        return self.frequency.lower() in ["daily", "weekly"]
 
 # -------------------- Pet --------------------
 @dataclass
@@ -98,7 +125,7 @@ class Scheduler:
     def sort_tasks_by_priority(self, tasks: List[Task]):
         """Sort tasks in descending order of priority: HIGH > MEDIUM > LOW."""
         priority_map = {"HIGH": 1, "MEDIUM": 2, "LOW": 3}
-        return sorted(tasks, key=lambda t: priority_map.get(t.priority.upper(), 4))
+        return sorted(tasks, key=lambda t: (priority_map.get(t.priority.upper(), 4), t.time))
 
     def generate_schedule(self):
         """Generate the daily schedule based on owner's available time and task priority."""
@@ -123,3 +150,42 @@ class Scheduler:
         for task in self.daily_plan:
             explanation += f"- {task.get_details()} for pet {task.pet.name}\n"
         return explanation
+
+    def sort_by_time(self):
+        """Sort tasks by time in HH:MM format."""
+        self.tasks_list.sort(key=lambda t: t.time)
+
+    def filter_by_pet(self, pet_name):
+        """Return tasks for a specific pet."""
+        return [t for t in self.tasks_list if t.pet and t.pet.name == pet_name]
+
+    def filter_completed(self, completed=True):
+        """Return tasks based on completion status."""
+        return [t for t in self.tasks_list if t.completed == completed]
+
+    def detect_conflicts(self):
+        """Detect scheduling conflicts based on overlapping times and return warning messages."""
+        def time_to_minutes(t: str) -> int:
+            h, m = map(int, t.split(':'))
+            return h * 60 + m
+        
+        def minutes_to_time(minutes: int) -> str:
+            h = minutes // 60
+            m = minutes % 60
+            return f"{h:02d}:{m:02d}"
+        
+        tasks = self.daily_plan  # Check conflicts in the daily plan
+        conflicts = []
+        for t1, t2 in combinations(tasks, 2):
+            start1 = time_to_minutes(t1.time)
+            end1 = start1 + t1.duration
+            start2 = time_to_minutes(t2.time)
+            end2 = start2 + t2.duration
+            if start1 < end2 and start2 < end1:
+                end1_str = minutes_to_time(end1)
+                end2_str = minutes_to_time(end2)
+                conflicts.append(f"Warning: Conflict between '{t1.name}' ({t1.time}-{end1_str}) and '{t2.name}' ({t2.time}-{end2_str})")
+        
+        if conflicts:
+            return "\n".join(conflicts)
+        return "No conflicts detected."
