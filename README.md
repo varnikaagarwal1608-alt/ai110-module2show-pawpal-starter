@@ -64,3 +64,25 @@ What the tests cover:
 -Conflict detection between overlapping tasks
 -Edge cases like empty lists, invalid times, and task updates
 Confidence Level: ⭐⭐⭐⭐⭐
+
+
+## Features
+
+PawPal+ includes several smart features:
+
+- **Task Management** – Add tasks with duration, priority, and frequency.
+- **Recurring Tasks** – Automatically repeat daily or weekly tasks.
+- **Task Completion Tracking** – Mark tasks as done; recurring tasks auto-generate for the next date.
+- **Conflict Detection** – Scheduler warns if tasks overlap for the same pet.
+- **Priority-Based Scheduling** – Scheduler sorts tasks based on priority and time availability.
+- **Filtering & Sorting** – View tasks by pet, completion status, or scheduled time.
+- **Interactive Streamlit UI** – Easily add pets, tasks, and generate schedules.
+
+
+## 📸 Demo
+
+Here’s a screenshot of the PawPal+ app running in Streamlit:
+
+<a href="/course_images/ai110/pawpal_demo.png
+" target="_blank"><img src='/course_images/ai110/your_screenshot_name.png' title='PawPal App' width='' alt='PawPal App' class='center-block' /></a>.
+!
